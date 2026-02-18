@@ -17,6 +17,19 @@ export default [
           allow: ['^.*/eslint(\\.base)?\\.config\\.[cm]?[jt]s$'],
           depConstraints: [
             // ============================================
+            // APP (shell) → peut tout importer
+            // ============================================
+            {
+              sourceTag: 'type:app',
+              onlyDependOnLibsWithTags: [
+                'type:feature',
+                'type:domain-logic',
+                'type:ui',
+                'type:models',
+                'type:util',
+              ],
+            },
+            // ============================================
             // FEATURE → peut importer domain, shared, core
             // ============================================
             {

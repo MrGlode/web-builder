@@ -2,7 +2,7 @@
   "name": "feature-page-builder",
   "$schema": "../../../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "libs/features/page-builder/src",
-  "prefix": "lib",
+  "prefix": "sf",
   "projectType": "library",
   "tags": ["scope:feature", "domain:page", "type:feature"],
   "targets": {
@@ -11,3 +11,4 @@
     }
   }
 }
+

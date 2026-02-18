@@ -2,13 +2,18 @@
   "name": "cms-admin",
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "projectType": "application",
-  "prefix": "app",
+  "prefix": "sf",
   "sourceRoot": "apps/cms-admin/src",
-  "tags": [],
+  "tags": [
+    "scope:app",
+    "type:app"
+  ],
   "targets": {
     "build": {
       "executor": "@angular/build:application",
-      "outputs": ["{options.outputPath}"],
+      "outputs": [
+        "{options.outputPath}"
+      ],
       "options": {
         "outputPath": "dist/apps/cms-admin",
         "browser": "apps/cms-admin/src/main.ts",
@@ -20,7 +25,9 @@
             "input": "apps/cms-admin/public"
           }
         ],
-        "styles": ["apps/cms-admin/src/styles.scss"]
+        "styles": [
+          "apps/cms-admin/src/styles.scss"
+        ]
       },
       "configurations": {
         "production": {

@@ -2,7 +2,7 @@
   "name": "shared-utils",
   "$schema": "../../../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "libs/shared/utils/src",
-  "prefix": "lib",
+  "prefix": "sf",
   "projectType": "library",
   "tags": ["scope:shared", "type:util"],
   "targets": {
@@ -11,3 +11,4 @@
     }
   }
 }
+

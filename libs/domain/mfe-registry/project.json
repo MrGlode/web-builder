@@ -2,7 +2,7 @@
   "name": "domain-mfe-registry",
   "$schema": "../../../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "libs/domain/mfe-registry/src",
-  "prefix": "lib",
+  "prefix": "sf",
   "projectType": "library",
   "tags": ["scope:domain", "domain:mfe-registry", "type:domain-logic"],
   "targets": {
@@ -11,3 +11,4 @@
     }
   }
 }
+

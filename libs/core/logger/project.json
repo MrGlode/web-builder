@@ -2,7 +2,7 @@
   "name": "core-logger",
   "$schema": "../../../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "libs/core/logger/src",
-  "prefix": "lib",
+  "prefix": "sf",
   "projectType": "library",
   "tags": ["scope:core", "type:util"],
   "targets": {
@@ -11,3 +11,4 @@
     }
   }
 }
+
