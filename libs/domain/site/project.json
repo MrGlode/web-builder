@@ -1,0 +1,13 @@
+{
+  "name": "domain-site",
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/domain/site/src",
+  "prefix": "lib",
+  "projectType": "library",
+  "tags": ["scope:domain", "domain:site", "type:domain-logic"],
+  "targets": {
+    "lint": {
+      "executor": "@nx/eslint:lint"
+    }
+  }
+}

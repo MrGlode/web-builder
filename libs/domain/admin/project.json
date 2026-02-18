@@ -1,0 +1,13 @@
+{
+  "name": "domain-admin",
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/domain/admin/src",
+  "prefix": "lib",
+  "projectType": "library",
+  "tags": ["scope:domain", "domain:admin", "type:domain-logic"],
+  "targets": {
+    "lint": {
+      "executor": "@nx/eslint:lint"
+    }
+  }
+}

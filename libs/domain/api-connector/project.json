@@ -1,0 +1,13 @@
+{
+  "name": "domain-api-connector",
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/domain/api-connector/src",
+  "prefix": "lib",
+  "projectType": "library",
+  "tags": ["scope:domain", "domain:api-connector", "type:domain-logic"],
+  "targets": {
+    "lint": {
+      "executor": "@nx/eslint:lint"
+    }
+  }
+}

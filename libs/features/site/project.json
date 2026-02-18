@@ -1,0 +1,13 @@
+{
+  "name": "feature-site",
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/features/site/src",
+  "prefix": "lib",
+  "projectType": "library",
+  "tags": ["scope:feature", "domain:site", "type:feature"],
+  "targets": {
+    "lint": {
+      "executor": "@nx/eslint:lint"
+    }
+  }
+}

@@ -14,7 +14,47 @@
     "skipLibCheck": true,
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
-    "paths": {}
+    "paths": {
+      "@site-factory/core-auth": ["libs/core/auth/src/index.ts"],
+      "@site-factory/core-http": ["libs/core/http/src/index.ts"],
+      "@site-factory/core-config": ["libs/core/config/src/index.ts"],
+      "@site-factory/core-i18n": ["libs/core/i18n/src/index.ts"],
+      "@site-factory/core-logger": ["libs/core/logger/src/index.ts"],
+      "@site-factory/shared-models": ["libs/shared/models/src/index.ts"],
+      "@site-factory/shared-utils": ["libs/shared/utils/src/index.ts"],
+      "@site-factory/shared-ui": ["libs/shared/ui/src/index.ts"],
+      "@site-factory/shared-design-system": [
+        "libs/shared/design-system/src/index.ts"
+      ],
+      "@site-factory/domain-site": ["libs/domain/site/src/index.ts"],
+      "@site-factory/domain-page": ["libs/domain/page/src/index.ts"],
+      "@site-factory/domain-api-connector": [
+        "libs/domain/api-connector/src/index.ts"
+      ],
+      "@site-factory/domain-mfe-registry": [
+        "libs/domain/mfe-registry/src/index.ts"
+      ],
+      "@site-factory/domain-iam": ["libs/domain/iam/src/index.ts"],
+      "@site-factory/domain-versioning": [
+        "libs/domain/versioning/src/index.ts"
+      ],
+      "@site-factory/domain-admin": ["libs/domain/admin/src/index.ts"],
+      "@site-factory/feature-site": ["libs/features/site/src/index.ts"],
+      "@site-factory/feature-page-builder": [
+        "libs/features/page-builder/src/index.ts"
+      ],
+      "@site-factory/feature-api-connector": [
+        "libs/features/api-connector/src/index.ts"
+      ],
+      "@site-factory/feature-mfe-registry": [
+        "libs/features/mfe-registry/src/index.ts"
+      ],
+      "@site-factory/feature-iam": ["libs/features/iam/src/index.ts"],
+      "@site-factory/feature-versioning": [
+        "libs/features/versioning/src/index.ts"
+      ],
+      "@site-factory/feature-admin": ["libs/features/admin/src/index.ts"]
+    }
   },
   "exclude": ["node_modules", "tmp"]
 }

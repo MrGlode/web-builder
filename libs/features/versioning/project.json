@@ -1,0 +1,13 @@
+{
+  "name": "feature-versioning",
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/features/versioning/src",
+  "prefix": "lib",
+  "projectType": "library",
+  "tags": ["scope:feature", "domain:versioning", "type:feature"],
+  "targets": {
+    "lint": {
+      "executor": "@nx/eslint:lint"
+    }
+  }
+}

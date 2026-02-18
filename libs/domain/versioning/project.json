@@ -1,0 +1,13 @@
+{
+  "name": "domain-versioning",
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/domain/versioning/src",
+  "prefix": "lib",
+  "projectType": "library",
+  "tags": ["scope:domain", "domain:versioning", "type:domain-logic"],
+  "targets": {
+    "lint": {
+      "executor": "@nx/eslint:lint"
+    }
+  }
+}

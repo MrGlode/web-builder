@@ -1,0 +1,13 @@
+{
+  "name": "domain-iam",
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/domain/iam/src",
+  "prefix": "lib",
+  "projectType": "library",
+  "tags": ["scope:domain", "domain:iam", "type:domain-logic"],
+  "targets": {
+    "lint": {
+      "executor": "@nx/eslint:lint"
+    }
+  }
+}

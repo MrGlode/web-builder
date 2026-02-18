@@ -1,0 +1,13 @@
+{
+  "name": "feature-api-connector",
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/features/api-connector/src",
+  "prefix": "lib",
+  "projectType": "library",
+  "tags": ["scope:feature", "domain:api-connector", "type:feature"],
+  "targets": {
+    "lint": {
+      "executor": "@nx/eslint:lint"
+    }
+  }
+}
