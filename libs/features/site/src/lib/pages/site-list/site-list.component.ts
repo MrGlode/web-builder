@@ -48,7 +48,7 @@ import { SiteStore } from '@site-factory/domain-site';
       @if (!store.isLoading() && store.hasSites()) {
         <div class="site-list__grid">
           @for (site of store.sites(); track site.id) {
-            <div class="site-card" (click)="goToDetail(site.id)">
+            <div class="site-card" role="button" tabindex="0" (click)="goToDetail(site.id)" (keyup.enter)="goToDetail(site.id)">
               <div class="site-card__header">
                 <h3 class="site-card__name">{{ site.name }}</h3>
                 <span
