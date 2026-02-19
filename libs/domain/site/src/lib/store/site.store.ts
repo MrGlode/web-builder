@@ -1,4 +1,4 @@
-﻿import { computed, inject } from '@angular/core';
+import { computed, inject } from '@angular/core';
 import {
   signalStore,
   withState,
@@ -116,7 +116,7 @@ export const SiteStore = signalStore(
       )
     ),
 
-    /** Mettre Ã  jour un site */
+    /** Mettre à jour un site */
     updateSite: rxMethod<{ id: string; payload: import('@site-factory/shared-models').UpdateSitePayload; onSuccess?: () => void }>(
       pipe(
         tap(() => patchState(store, { isLoading: true, error: null })),

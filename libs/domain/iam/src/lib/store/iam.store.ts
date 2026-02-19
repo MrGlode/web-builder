@@ -1,4 +1,4 @@
-﻿import { computed, inject } from '@angular/core';
+import { computed, inject } from '@angular/core';
 import {
   signalStore,
   withState,
@@ -134,7 +134,7 @@ export const IamStore = signalStore(
       )
     ),
 
-    /** Assigner un rÃ´le Ã  un utilisateur */
+    /** Assigner un rôle à un utilisateur */
     assignRole: rxMethod<{ userId: string; roleId: string; siteId?: string; onSuccess?: () => void }>(
       pipe(
         tap(() => patchState(store, { isLoading: true, error: null })),

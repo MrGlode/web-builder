@@ -1,4 +1,4 @@
-﻿import { computed, inject } from '@angular/core';
+import { computed, inject } from '@angular/core';
 import {
   signalStore,
   withState,
@@ -97,7 +97,7 @@ export const AdminStore = signalStore(
       )
     ),
 
-    /** Mettre Ã  jour un thÃ¨me */
+    /** Mettre à jour un thÃ¨me */
     updateTheme: rxMethod<{ id: string; payload: Partial<CreateThemePayload>; onSuccess?: () => void }>(
       pipe(
         tap(() => patchState(store, { isLoading: true, error: null })),
@@ -183,7 +183,7 @@ export const AdminStore = signalStore(
       )
     ),
 
-    /** CrÃ©er ou mettre Ã  jour une traduction (upsert) */
+    /** CrÃ©er ou mettre à jour une traduction (upsert) */
     upsertTranslation: rxMethod<{ payload: UpsertTranslationPayload; onSuccess?: () => void }>(
       pipe(
         tap(() => patchState(store, { isLoading: true, error: null })),
@@ -267,7 +267,7 @@ export const AdminStore = signalStore(
       )
     ),
 
-    /** Mettre Ã  jour un paramÃ¨tre de config */
+    /** Mettre à jour un paramètre de config */
     updateGlobalConfig: rxMethod<{ key: string; payload: UpdateGlobalConfigPayload; onSuccess?: () => void }>(
       pipe(
         tap(() => patchState(store, { isLoading: true, error: null })),

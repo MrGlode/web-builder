@@ -1,4 +1,4 @@
-﻿import { computed, inject } from '@angular/core';
+import { computed, inject } from '@angular/core';
 import {
   signalStore,
   withState,
@@ -117,7 +117,7 @@ export const MfeRegistryStore = signalStore(
       )
     ),
 
-    /** Mettre Ã  jour un MFE */
+    /** Mettre à jour un MFE */
     updateMfe: rxMethod<{ id: string; payload: Partial<CreateMfePayload>; onSuccess?: () => void }>(
       pipe(
         tap(() => patchState(store, { isLoading: true, error: null })),
