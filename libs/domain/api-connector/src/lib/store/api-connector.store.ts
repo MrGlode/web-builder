@@ -1,4 +1,4 @@
-import { computed, inject } from '@angular/core';
+﻿import { computed, inject } from '@angular/core';
 import {
   signalStore,
   withState,
@@ -16,10 +16,10 @@ import type { ApiConnectorFilters } from '../models/api-connector-filters.model'
 export const ApiConnectorStore = signalStore(
   { providedIn: 'root' },
 
-  // ─── State ──────────────────────────────────────
+  // â”€â”€â”€ State â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   withState<ApiConnectorState>(INITIAL_API_CONNECTOR_STATE),
 
-  // ─── Computed ───────────────────────────────────
+  // â”€â”€â”€ Computed â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   withComputed(state => ({
     totalPages: computed(() =>
       Math.ceil(state.total() / state.pageSize())
@@ -32,15 +32,15 @@ export const ApiConnectorStore = signalStore(
     ),
   })),
 
-  // ─── Methods ────────────────────────────────────
+  // â”€â”€â”€ Methods â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   withMethods((store, apiService = inject(ApiConnectorApiService)) => ({
 
-    /** Charger les références API avec filtres optionnels */
+    /** Charger les rÃ©fÃ©rences API avec filtres optionnels */
     loadApiReferences: rxMethod<ApiConnectorFilters | void>(
       pipe(
         tap(() => patchState(store, { isLoading: true, error: null })),
         switchMap((filters?: ApiConnectorFilters | void) =>
-          apiService.getAll(filters ?? undefined).pipe(
+          apiService.getAll((filters || undefined) as ApiConnectorFilters | undefined).pipe(
             tap(response => {
               patchState(store, {
                 apiReferences: response.data,
@@ -62,7 +62,7 @@ export const ApiConnectorStore = signalStore(
       )
     ),
 
-    /** Charger une référence API par ID */
+    /** Charger une rÃ©fÃ©rence API par ID */
     loadApiRefById: rxMethod<string>(
       pipe(
         tap(() => patchState(store, { isLoading: true, error: null })),
@@ -107,7 +107,7 @@ export const ApiConnectorStore = signalStore(
       )
     ),
 
-    /** Sélectionner une API */
+    /** SÃ©lectionner une API */
     selectApiRef(apiRef: ApiReference | null): void {
       patchState(store, { selectedApiRef: apiRef });
     },
@@ -117,7 +117,7 @@ export const ApiConnectorStore = signalStore(
       patchState(store, { error: null });
     },
 
-    /** Réinitialiser le store */
+    /** RÃ©initialiser le store */
     reset(): void {
       patchState(store, INITIAL_API_CONNECTOR_STATE);
     },

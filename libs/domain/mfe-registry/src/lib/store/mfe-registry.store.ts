@@ -1,4 +1,4 @@
-import { computed, inject } from '@angular/core';
+﻿import { computed, inject } from '@angular/core';
 import {
   signalStore,
   withState,
@@ -20,10 +20,10 @@ import type { MfeRegistryFilters } from '../models/mfe-registry-filters.model';
 export const MfeRegistryStore = signalStore(
   { providedIn: 'root' },
 
-  // ─── State ──────────────────────────────────────
+  // â”€â”€â”€ State â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   withState<MfeRegistryState>(INITIAL_MFE_REGISTRY_STATE),
 
-  // ─── Computed ───────────────────────────────────
+  // â”€â”€â”€ Computed â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   withComputed(state => ({
     totalPages: computed(() =>
       Math.ceil(state.total() / state.pageSize())
@@ -37,7 +37,7 @@ export const MfeRegistryStore = signalStore(
     ),
   })),
 
-  // ─── Methods ────────────────────────────────────
+  // â”€â”€â”€ Methods â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   withMethods((store, mfeApi = inject(MfeRegistryApiService)) => ({
 
     /** Charger la liste des MFE */
@@ -45,7 +45,7 @@ export const MfeRegistryStore = signalStore(
       pipe(
         tap(() => patchState(store, { isLoading: true, error: null })),
         switchMap((filters?: MfeRegistryFilters | void) =>
-          mfeApi.getAll(filters ?? undefined).pipe(
+          mfeApi.getAll((filters || undefined) as MfeRegistryFilters | undefined).pipe(
             tap(response => {
               patchState(store, {
                 mfes: response.data,
@@ -91,7 +91,7 @@ export const MfeRegistryStore = signalStore(
       )
     ),
 
-    /** Créer un MFE */
+    /** CrÃ©er un MFE */
     createMfe: rxMethod<{ payload: CreateMfePayload; onSuccess?: () => void }>(
       pipe(
         tap(() => patchState(store, { isLoading: true, error: null })),
@@ -117,7 +117,7 @@ export const MfeRegistryStore = signalStore(
       )
     ),
 
-    /** Mettre à jour un MFE */
+    /** Mettre Ã  jour un MFE */
     updateMfe: rxMethod<{ id: string; payload: Partial<CreateMfePayload>; onSuccess?: () => void }>(
       pipe(
         tap(() => patchState(store, { isLoading: true, error: null })),
@@ -178,7 +178,7 @@ export const MfeRegistryStore = signalStore(
       )
     ),
 
-    /** Charger les déploiements d'un MFE */
+    /** Charger les dÃ©ploiements d'un MFE */
     loadDeployments: rxMethod<string>(
       pipe(
         tap(() => patchState(store, { isLoading: true, error: null })),
@@ -202,7 +202,7 @@ export const MfeRegistryStore = signalStore(
       )
     ),
 
-    /** Créer un déploiement */
+    /** CrÃ©er un dÃ©ploiement */
     createDeployment: rxMethod<{ mfeId: string; payload: CreateMfeDeploymentPayload; onSuccess?: () => void }>(
       pipe(
         tap(() => patchState(store, { isLoading: true, error: null })),
@@ -227,7 +227,7 @@ export const MfeRegistryStore = signalStore(
       )
     ),
 
-    /** Sélectionner un MFE */
+    /** SÃ©lectionner un MFE */
     selectMfe(mfe: MicroFrontend | null): void {
       patchState(store, { selectedMfe: mfe, deployments: [] });
     },

@@ -1,4 +1,4 @@
-import { computed, inject } from '@angular/core';
+﻿import { computed, inject } from '@angular/core';
 import {
   signalStore,
   withState,
@@ -16,10 +16,10 @@ import type { IamFilters } from '../models/iam-filters.model';
 export const IamStore = signalStore(
   { providedIn: 'root' },
 
-  // ─── State ──────────────────────────────────────
+  // â”€â”€â”€ State â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   withState<IamState>(INITIAL_IAM_STATE),
 
-  // ─── Computed ───────────────────────────────────
+  // â”€â”€â”€ Computed â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   withComputed(state => ({
     totalPages: computed(() =>
       Math.ceil(state.total() / state.pageSize())
@@ -32,7 +32,7 @@ export const IamStore = signalStore(
     customRoles: computed(() => state.roles().filter(r => !r.isSystem)),
   })),
 
-  // ─── Methods ────────────────────────────────────
+  // â”€â”€â”€ Methods â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   withMethods((store, iamApi = inject(IamApiService)) => ({
 
     /** Charger la liste des utilisateurs */
@@ -40,7 +40,7 @@ export const IamStore = signalStore(
       pipe(
         tap(() => patchState(store, { isLoading: true, error: null })),
         switchMap((filters?: IamFilters | void) =>
-          iamApi.getUsers(filters ?? undefined).pipe(
+          iamApi.getUsers((filters || undefined) as IamFilters | undefined).pipe(
             tap(response => {
               patchState(store, {
                 users: response.data,
@@ -86,7 +86,7 @@ export const IamStore = signalStore(
       )
     ),
 
-    /** Charger tous les rôles disponibles */
+    /** Charger tous les rÃ´les disponibles */
     loadRoles: rxMethod<void>(
       pipe(
         tap(() => patchState(store, { isLoading: true, error: null })),
@@ -110,7 +110,7 @@ export const IamStore = signalStore(
       )
     ),
 
-    /** Charger les assignations rôle/site d'un utilisateur */
+    /** Charger les assignations rÃ´le/site d'un utilisateur */
     loadUserSiteRoles: rxMethod<string>(
       pipe(
         tap(() => patchState(store, { isLoading: true, error: null })),
@@ -134,7 +134,7 @@ export const IamStore = signalStore(
       )
     ),
 
-    /** Assigner un rôle à un utilisateur */
+    /** Assigner un rÃ´le Ã  un utilisateur */
     assignRole: rxMethod<{ userId: string; roleId: string; siteId?: string; onSuccess?: () => void }>(
       pipe(
         tap(() => patchState(store, { isLoading: true, error: null })),
@@ -159,7 +159,7 @@ export const IamStore = signalStore(
       )
     ),
 
-    /** Révoquer un rôle */
+    /** RÃ©voquer un rÃ´le */
     revokeRole: rxMethod<{ userId: string; assignmentId: string; onSuccess?: () => void }>(
       pipe(
         tap(() => patchState(store, { isLoading: true, error: null })),
@@ -184,7 +184,7 @@ export const IamStore = signalStore(
       )
     ),
 
-    /** Sélectionner un utilisateur */
+    /** SÃ©lectionner un utilisateur */
     selectUser(user: UserProfile | null): void {
       patchState(store, { selectedUser: user, userSiteRoles: [] });
     },

@@ -1,4 +1,4 @@
-import { computed, inject } from '@angular/core';
+﻿import { computed, inject } from '@angular/core';
 import {
   signalStore,
   withState,
@@ -19,10 +19,10 @@ import type { AuditFilters } from '../models/audit-filters.model';
 export const AuditStore = signalStore(
   { providedIn: 'root' },
 
-  // ─── State ──────────────────────────────────────
+  // â”€â”€â”€ State â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   withState<AuditState>(INITIAL_AUDIT_STATE),
 
-  // ─── Computed ───────────────────────────────────
+  // â”€â”€â”€ Computed â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   withComputed(state => ({
     totalPages: computed(() =>
       Math.ceil(state.total() / state.pageSize())
@@ -32,7 +32,7 @@ export const AuditStore = signalStore(
     logCount: computed(() => state.logs().length),
   })),
 
-  // ─── Methods ────────────────────────────────────
+  // â”€â”€â”€ Methods â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   withMethods((store, auditApi = inject(AuditApiService)) => ({
 
     /** Charger les logs d'audit avec filtres */
@@ -40,7 +40,7 @@ export const AuditStore = signalStore(
       pipe(
         tap(() => patchState(store, { isLoading: true, error: null })),
         switchMap((filters?: AuditFilters | void) =>
-          auditApi.getAll(filters ?? undefined).pipe(
+          auditApi.getAll((filters || undefined) as AuditFilters | undefined).pipe(
             tap(response => {
               patchState(store, {
                 logs: response.data,

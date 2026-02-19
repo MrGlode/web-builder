@@ -1,4 +1,4 @@
-import { computed, inject } from '@angular/core';
+﻿import { computed, inject } from '@angular/core';
 import {
   signalStore,
   withState,
@@ -16,27 +16,27 @@ import { SiteFilters } from '../models/site-filters.model';
 export const SiteStore = signalStore(
   { providedIn: 'root' },
 
-  // ─── State ──────────────────────────────────────
+  // â”€â”€â”€ State â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   withState<SiteState>(INITIAL_SITE_STATE),
 
-  // ─── Computed ───────────────────────────────────
+  // â”€â”€â”€ Computed â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   withComputed(state => ({
     /** Nombre total de pages */
     totalPages: computed(() =>
       Math.ceil(state.total() / state.pageSize())
     ),
 
-    /** Y a-t-il des sites chargés ? */
+    /** Y a-t-il des sites chargÃ©s ? */
     hasSites: computed(() => state.sites().length > 0),
 
-    /** Le store est-il dans un état d'erreur ? */
+    /** Le store est-il dans un Ã©tat d'erreur ? */
     hasError: computed(() => state.error() !== null),
 
-    /** Nombre de sites chargés */
+    /** Nombre de sites chargÃ©s */
     siteCount: computed(() => state.sites().length),
   })),
 
-  // ─── Methods ────────────────────────────────────
+  // â”€â”€â”€ Methods â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   withMethods((store, siteApi = inject(SiteApiService)) => ({
 
     /** Charger la liste des sites avec filtres optionnels */
@@ -44,7 +44,7 @@ export const SiteStore = signalStore(
       pipe(
         tap(() => patchState(store, { isLoading: true, error: null })),
         switchMap((filters?: SiteFilters | void) =>
-          siteApi.getAll(filters ?? undefined).pipe(
+          siteApi.getAll((filters || undefined) as SiteFilters | undefined).pipe(
             tap(response => {
               patchState(store, {
                 sites: response.data,
@@ -90,7 +90,7 @@ export const SiteStore = signalStore(
       )
     ),
 
-    /** Créer un nouveau site */
+    /** CrÃ©er un nouveau site */
     createSite: rxMethod<{ payload: import('@site-factory/shared-models').CreateSitePayload; onSuccess?: () => void }>(
       pipe(
         tap(() => patchState(store, { isLoading: true, error: null })),
@@ -107,7 +107,7 @@ export const SiteStore = signalStore(
             catchError(error => {
               patchState(store, {
                 isLoading: false,
-                error: error?.message ?? 'Erreur lors de la création du site',
+                error: error?.message ?? 'Erreur lors de la crÃ©ation du site',
               });
               return of(null);
             })
@@ -116,7 +116,7 @@ export const SiteStore = signalStore(
       )
     ),
 
-    /** Mettre à jour un site */
+    /** Mettre Ã  jour un site */
     updateSite: rxMethod<{ id: string; payload: import('@site-factory/shared-models').UpdateSitePayload; onSuccess?: () => void }>(
       pipe(
         tap(() => patchState(store, { isLoading: true, error: null })),
@@ -138,7 +138,7 @@ export const SiteStore = signalStore(
             catchError(error => {
               patchState(store, {
                 isLoading: false,
-                error: error?.message ?? 'Erreur lors de la mise à jour du site',
+                error: error?.message ?? 'Erreur lors de la mise Ã  jour du site',
               });
               return of(null);
             })
@@ -177,7 +177,7 @@ export const SiteStore = signalStore(
       )
     ),
 
-    /** Sélectionner un site */
+    /** SÃ©lectionner un site */
     selectSite(site: Site | null): void {
       patchState(store, { selectedSite: site });
     },
@@ -187,7 +187,7 @@ export const SiteStore = signalStore(
       patchState(store, { error: null });
     },
 
-    /** Réinitialiser le store */
+    /** RÃ©initialiser le store */
     reset(): void {
       patchState(store, INITIAL_SITE_STATE);
     },

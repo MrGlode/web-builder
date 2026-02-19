@@ -1,4 +1,4 @@
-import { computed, inject } from '@angular/core';
+﻿import { computed, inject } from '@angular/core';
 import {
   signalStore,
   withState,
@@ -21,10 +21,10 @@ import type { TranslationFilters, ThemeFilters } from '../models/admin-filters.m
 export const AdminStore = signalStore(
   { providedIn: 'root' },
 
-  // ─── State ──────────────────────────────────────
+  // â”€â”€â”€ State â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   withState<AdminState>(INITIAL_ADMIN_STATE),
 
-  // ─── Computed ───────────────────────────────────
+  // â”€â”€â”€ Computed â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   withComputed(state => ({
     hasThemes: computed(() => state.themes().length > 0),
     hasTranslations: computed(() => state.translations().length > 0),
@@ -33,7 +33,7 @@ export const AdminStore = signalStore(
     defaultTheme: computed(() =>
       state.themes().find(t => t.isDefault) ?? null
     ),
-    /** Traductions regroupées par locale */
+    /** Traductions regroupÃ©es par locale */
     translationsByLocale: computed(() => {
       const map = new Map<string, number>();
       for (const t of state.translations()) {
@@ -43,17 +43,17 @@ export const AdminStore = signalStore(
     }),
   })),
 
-  // ─── Methods ────────────────────────────────────
+  // â”€â”€â”€ Methods â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   withMethods((store, adminApi = inject(AdminApiService)) => ({
 
-    // ─── Themes ───────────────────────────────────
+    // â”€â”€â”€ Themes â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-    /** Charger les thèmes */
+    /** Charger les thÃ¨mes */
     loadThemes: rxMethod<ThemeFilters | void>(
       pipe(
         tap(() => patchState(store, { isLoading: true, error: null })),
         switchMap((filters?: ThemeFilters | void) =>
-          adminApi.getThemes(filters ?? undefined).pipe(
+          adminApi.getThemes((filters || undefined) as ThemeFilters | undefined).pipe(
             tap(response => {
               patchState(store, {
                 themes: response.data,
@@ -72,7 +72,7 @@ export const AdminStore = signalStore(
       )
     ),
 
-    /** Créer un thème */
+    /** CrÃ©er un thÃ¨me */
     createTheme: rxMethod<{ payload: CreateThemePayload; onSuccess?: () => void }>(
       pipe(
         tap(() => patchState(store, { isLoading: true, error: null })),
@@ -97,7 +97,7 @@ export const AdminStore = signalStore(
       )
     ),
 
-    /** Mettre à jour un thème */
+    /** Mettre Ã  jour un thÃ¨me */
     updateTheme: rxMethod<{ id: string; payload: Partial<CreateThemePayload>; onSuccess?: () => void }>(
       pipe(
         tap(() => patchState(store, { isLoading: true, error: null })),
@@ -128,7 +128,7 @@ export const AdminStore = signalStore(
       )
     ),
 
-    /** Supprimer un thème */
+    /** Supprimer un thÃ¨me */
     deleteTheme: rxMethod<{ id: string; onSuccess?: () => void }>(
       pipe(
         tap(() => patchState(store, { isLoading: true, error: null })),
@@ -157,14 +157,14 @@ export const AdminStore = signalStore(
       )
     ),
 
-    // ─── Translations ─────────────────────────────
+    // â”€â”€â”€ Translations â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     /** Charger les traductions */
     loadTranslations: rxMethod<TranslationFilters | void>(
       pipe(
         tap(() => patchState(store, { isLoading: true, error: null })),
         switchMap((filters?: TranslationFilters | void) =>
-          adminApi.getTranslations(filters ?? undefined).pipe(
+          adminApi.getTranslations((filters || undefined) as TranslationFilters | undefined).pipe(
             tap(response => {
               patchState(store, {
                 translations: response.data,
@@ -183,7 +183,7 @@ export const AdminStore = signalStore(
       )
     ),
 
-    /** Créer ou mettre à jour une traduction (upsert) */
+    /** CrÃ©er ou mettre Ã  jour une traduction (upsert) */
     upsertTranslation: rxMethod<{ payload: UpsertTranslationPayload; onSuccess?: () => void }>(
       pipe(
         tap(() => patchState(store, { isLoading: true, error: null })),
@@ -241,7 +241,7 @@ export const AdminStore = signalStore(
       )
     ),
 
-    // ─── Global Config ────────────────────────────
+    // â”€â”€â”€ Global Config â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     /** Charger la configuration globale */
     loadGlobalConfigs: rxMethod<void>(
@@ -267,7 +267,7 @@ export const AdminStore = signalStore(
       )
     ),
 
-    /** Mettre à jour un paramètre de config */
+    /** Mettre Ã  jour un paramÃ¨tre de config */
     updateGlobalConfig: rxMethod<{ key: string; payload: UpdateGlobalConfigPayload; onSuccess?: () => void }>(
       pipe(
         tap(() => patchState(store, { isLoading: true, error: null })),
@@ -294,7 +294,7 @@ export const AdminStore = signalStore(
       )
     ),
 
-    // ─── Common ───────────────────────────────────
+    // â”€â”€â”€ Common â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     selectTheme(theme: Theme | null): void {
       patchState(store, { selectedTheme: theme });
