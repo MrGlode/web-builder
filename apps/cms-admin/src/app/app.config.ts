@@ -1,38 +1,43 @@
-import { ApplicationConfig, provideZoneChangeDetection, isDevMode } from '@angular/core';
+﻿import { ApplicationConfig, provideZoneChangeDetection } from '@angular/core';
 import { provideRouter, withComponentInputBinding } from '@angular/router';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { provideLogger, LogLevel } from '@site-factory/core-logger';
 import { provideAuth } from '@site-factory/core-auth';
+import { provideConfig } from '@site-factory/core-config';
 import { errorInterceptor, loadingInterceptor } from '@site-factory/core-http';
 import { mockApiInterceptor } from './mocks/mock.interceptor';
 import { appRoutes } from './app.routes';
+import { environment } from '../environments/environment';
 
 export const appConfig: ApplicationConfig = {
   providers: [
     provideZoneChangeDetection({ eventCoalescing: true }),
     provideRouter(appRoutes, withComponentInputBinding()),
 
-    // HTTP avec interceptors — mock en premier pour intercepter avant les autres
+    // Configuration globale
+    provideConfig(environment),
+
+    // HTTP avec interceptors - mock uniquement si active
     provideHttpClient(
       withInterceptors([
-        ...(isDevMode() ? [mockApiInterceptor] : []),
+        ...(environment.features.enableMocks ? [mockApiInterceptor] : []),
         loadingInterceptor,
         errorInterceptor,
       ])
     ),
 
     provideLogger({
-      minLevel: isDevMode() ? LogLevel.Debug : LogLevel.Warn,
-      enableConsole: isDevMode(),
+      minLevel: environment.production ? LogLevel.Warn : LogLevel.Debug,
+      enableConsole: !environment.production,
     }),
 
     ...provideAuth({
-      issuerUrl: 'https://is.placeholder.company.com/oauth2/token',
-      clientId: 'site-factory-cms',
-      redirectUri: 'http://localhost:4200',
-      postLogoutRedirectUri: 'http://localhost:4200',
-      scopes: 'openid profile email',
-      securedApiUrls: ['https://api.placeholder.company.com'],
+      issuerUrl: environment.auth.issuerUrl,
+      clientId: environment.auth.clientId,
+      redirectUri: window.location.origin,
+      postLogoutRedirectUri: window.location.origin,
+      scopes: environment.auth.scopes,
+      securedApiUrls: [...environment.auth.securedApiUrls],
     }),
   ],
 };

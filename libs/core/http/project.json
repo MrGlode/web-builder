@@ -4,7 +4,7 @@
   "sourceRoot": "libs/core/http/src",
   "prefix": "sf",
   "projectType": "library",
-  "tags": ["scope:core", "type:util"],
+  "tags": ["scope:core", "type:core"],
   "targets": {
     "lint": {
       "executor": "@nx/eslint:lint"
