@@ -1,10 +1,10 @@
 # Site Factory CMS — Document d'Architecture
 
-> **Version** : 2.0  
-> **Date** : 18 février 2026  
-> **Statut** : En cours de construction  
+> **Version** : 3.0  
+> **Date** : 19 février 2026  
+> **Statut** : En cours de construction — Phase 1 (Fondations) en cours  
 > **Stack** : Angular v21 · Nx Monorepo · NgRx SignalStore · SCSS  
-> **Socle externe** : WSO2 IS (Auth) · WSO2 APIM 4.6 (API Catalog) · Design System (vanilla JS/SCSS)
+> **Socle externe** : WSO2 IS (Auth OIDC) · WSO2 APIM 4.6 (API Catalog) · Design System (vanilla JS/SCSS)
 
 ---
 
@@ -16,12 +16,15 @@
 4. [Architecture en Couches](#4-architecture-en-couches)
 5. [Structure Monorepo Nx](#5-structure-monorepo-nx)
 6. [Module Boundaries](#6-module-boundaries)
-7. [Modèle de Données](#7-modèle-de-données)
-8. [Schéma Relationnel Global](#8-schéma-relationnel-global)
-9. [Index Recommandés](#9-index-recommandés)
-10. [Conventions](#10-conventions)
-11. [Risques et Mitigations](#11-risques-et-mitigations)
-12. [Roadmap Technique](#12-roadmap-technique)
+7. [Core — Services d'infrastructure](#7-core--services-dinfrastructure)
+8. [Domain — Pattern SignalStore](#8-domain--pattern-signalstore)
+9. [Feature — Pattern écran fonctionnel](#9-feature--pattern-écran-fonctionnel)
+10. [Modèle de Données](#10-modèle-de-données)
+11. [Schéma Relationnel Global](#11-schéma-relationnel-global)
+12. [Index Recommandés](#12-index-recommandés)
+13. [Conventions](#13-conventions)
+14. [Risques et Mitigations](#14-risques-et-mitigations)
+15. [Roadmap Technique](#15-roadmap-technique)
 
 ---
 
@@ -181,11 +184,14 @@ Le CMS est structuré en **7 domaines fonctionnels**, priorisés en 3 tiers.
 | **Monorepo** | Nx | Cache de build, module boundaries, affected commands. Indispensable pour 7 domaines + libs partagées. |
 | **State Management** | NgRx SignalStore | Sweet spot entre structure (features, computed, methods) et légèreté. Natif signals Angular v21. Pas le boilerplate du Store classique. |
 | **Design System** | Lib interne + wrappers Angular | DS existant en vanilla JS/SCSS. Wrapper Angular dans `shared/design-system`, migration progressive. |
-| **Authentification** | WSO2 IS via OIDC/OAuth2 | Infrastructure existante. Pas de duplication. |
+| **Authentification** | WSO2 IS via OIDC (Authorization Code + PKCE) | Infrastructure existante. Lib `angular-auth-oidc-client`. |
 | **Catalogue API** | Connecteur WSO2 APIM 4.6 | Read-only + cache. Pas de registre maison. |
 | **Micro-Frontends** | Angular Module Federation | Architecture remotes/host pour chargement dynamique de composants. |
 | **CSS** | SCSS | Cohérence avec le DS existant. |
 | **Versioning données** | Snapshot JSON polymorphique | Une seule table `EntityVersion` pour toutes les entités. Simple, auditable. |
+| **Interceptors** | Functional (Angular v21) | Plus de classes. `HttpInterceptorFn` + `HttpContextToken` pour le contrôle par requête. |
+| **HTTP Client** | `ApiClientService` wrapper | Abstrait `HttpClient`, intègre les options (skipLoading, skipErrorHandling). |
+| **Mocking (dev)** | Mock Interceptor | Simule les API en dev. Delay réaliste (600ms). Activé via `isDevMode()`. |
 
 ---
 
@@ -197,14 +203,15 @@ Le CMS est structuré en **7 domaines fonctionnels**, priorisés en 3 tiers.
 ├──────────┬──────────┬──────────┬────────────────────────┤
 │   Core   │  Domain  │ Features │      Shared            │
 ├──────────┼──────────┼──────────┼────────────────────────┤
-│ Auth     │ Site     │ Site UI  │ Models (interfaces)    │
+│ Auth ✅  │ Site ✅  │ Site ✅  │ Models ✅ (interfaces) │
 │ (WSO2)   │ Page     │ Page Bld │ Utils (helpers)        │
-│ HTTP     │ API Conn │ API UI   │ UI (dumb components)   │
+│ HTTP ✅  │ API Conn │ API UI   │ UI (dumb components)   │
 │ Config   │ MFE Reg  │ MFE UI   │ Design System          │
 │ i18n     │ IAM      │ IAM UI   │ (wrappers Angular)     │
-│ Logger   │ Version. │ Vers. UI │                        │
+│ Logger ✅│ Version. │ Vers. UI │                        │
 │          │ Admin    │ Admin UI │                        │
 └──────────┴──────────┴──────────┴────────────────────────┘
+                       ✅ = implémenté
 ```
 
 | Couche | Rôle | Contient | Importe |
@@ -226,65 +233,70 @@ site-factory/
 │   └── cms-admin/                       ← Application shell Angular
 │       ├── src/
 │       │   ├── app/
-│       │   │   ├── app.ts
-│       │   │   ├── app.config.ts
-│       │   │   ├── app.routes.ts        ← Lazy loading des features
-│       │   │   └── app.scss
+│       │   │   ├── app.ts               ← AppComponent (sf-root)
+│       │   │   ├── app.config.ts        ← Providers (HTTP, Auth, Logger)
+│       │   │   ├── app.routes.ts        ← Lazy loading des 7 features
+│       │   │   ├── layout/
+│       │   │   │   ├── shell/           ← ShellComponent (sidebar + header + outlet)
+│       │   │   │   ├── sidebar/         ← SidebarComponent (navigation)
+│       │   │   │   └── header/          ← HeaderComponent (breadcrumb, user)
+│       │   │   └── mocks/              ← Mock interceptors (dev only)
+│       │   │       ├── site.mock.ts     ← Données mockées
+│       │   │       └── mock.interceptor.ts
 │       │   ├── index.html
 │       │   ├── main.ts
 │       │   └── styles.scss
-│       ├── project.json
+│       ├── project.json                 ← tags: scope:app, type:app, prefix: sf
 │       └── tsconfig.json
 │
 ├── libs/
 │   ├── core/                            ← Infrastructure technique
-│   │   ├── auth/src/lib/
-│   │   │   ├── services/                ← AuthService (WSO2 IS)
-│   │   │   ├── guards/                  ← AuthGuard, RoleGuard
-│   │   │   ├── interceptors/            ← TokenInterceptor
-│   │   │   ├── providers/               ← provideAuth()
-│   │   │   └── models/                  ← AuthState, TokenPayload
-│   │   ├── http/src/lib/
-│   │   │   ├── services/                ← ApiClient
-│   │   │   ├── interceptors/            ← ErrorInterceptor, LoadingInterceptor
-│   │   │   └── models/                  ← ApiResponse<T>
-│   │   ├── config/src/lib/
-│   │   │   ├── services/                ← ConfigService
-│   │   │   └── models/                  ← AppConfig, Environment
-│   │   ├── i18n/src/lib/
-│   │   │   ├── services/                ← TranslationService
-│   │   │   ├── pipes/                   ← TranslatePipe
-│   │   │   └── models/                  ← Locale, TranslationMap
-│   │   └── logger/src/lib/
-│   │       ├── services/                ← LoggerService
-│   │       └── models/                  ← LogLevel, LogEntry
+│   │   ├── auth/src/lib/                ✅ IMPLÉMENTÉ
+│   │   │   ├── models/                  ← AuthState, AuthUser, SfAuthConfig
+│   │   │   ├── services/               ← AuthService (WSO2 IS wrapper)
+│   │   │   ├── guards/                 ← authGuard, roleGuard
+│   │   │   ├── interceptors/           ← tokenInterceptor
+│   │   │   └── providers/              ← provideAuth()
+│   │   ├── http/src/lib/                ✅ IMPLÉMENTÉ
+│   │   │   ├── models/                  ← ApiResponse<T>, ApiHttpError, HttpRequestOptions
+│   │   │   ├── services/               ← ApiClientService, LoadingService
+│   │   │   ├── interceptors/           ← errorInterceptor, loadingInterceptor
+│   │   │   └── providers/              ← provideHttpCore()
+│   │   ├── logger/src/lib/              ✅ IMPLÉMENTÉ
+│   │   │   ├── models/                  ← LogLevel, LogEntry, LoggerConfig
+│   │   │   ├── services/               ← LoggerService
+│   │   │   └── providers/              ← provideLogger()
+│   │   ├── config/src/lib/              ⬜ À CONSTRUIRE
+│   │   └── i18n/src/lib/               ⬜ À CONSTRUIRE
 │   │
 │   ├── domain/                          ← Logique métier (1 lib / domaine)
-│   │   ├── site/src/lib/
-│   │   │   ├── store/                   ← SiteStore (NgRx SignalStore)
-│   │   │   ├── services/                ← SiteApiService
-│   │   │   └── models/                  ← (re-exports shared/models/site)
-│   │   ├── page/src/lib/                ← idem pattern
-│   │   ├── api-connector/src/lib/       ← idem pattern
-│   │   ├── mfe-registry/src/lib/        ← idem pattern
-│   │   ├── iam/src/lib/                 ← idem pattern
-│   │   ├── versioning/src/lib/          ← idem pattern
-│   │   └── admin/src/lib/               ← idem pattern
+│   │   ├── site/src/lib/                ✅ IMPLÉMENTÉ (pattern de référence)
+│   │   │   ├── models/                  ← SiteState, SiteFilters
+│   │   │   ├── services/               ← SiteApiService
+│   │   │   └── store/                  ← SiteStore (NgRx SignalStore)
+│   │   ├── page/src/lib/               ⬜ À RÉPLIQUER
+│   │   ├── api-connector/src/lib/      ⬜ À RÉPLIQUER
+│   │   ├── mfe-registry/src/lib/       ⬜ À RÉPLIQUER
+│   │   ├── iam/src/lib/                ⬜ À RÉPLIQUER
+│   │   ├── versioning/src/lib/         ⬜ À RÉPLIQUER
+│   │   └── admin/src/lib/              ⬜ À RÉPLIQUER
 │   │
 │   ├── features/                        ← UI intelligente (1 lib / domaine)
-│   │   ├── site/src/lib/
-│   │   │   ├── pages/                   ← SiteListPage, SiteDetailPage
-│   │   │   ├── containers/              ← SiteFormContainer
-│   │   │   └── routes.ts               ← export const SITE_ROUTES
-│   │   ├── page-builder/src/lib/        ← idem pattern
-│   │   ├── api-connector/src/lib/       ← idem pattern
-│   │   ├── mfe-registry/src/lib/        ← idem pattern
-│   │   ├── iam/src/lib/                 ← idem pattern
-│   │   ├── versioning/src/lib/          ← idem pattern
-│   │   └── admin/src/lib/               ← idem pattern
+│   │   ├── site/src/lib/                ✅ IMPLÉMENTÉ (pattern de référence)
+│   │   │   ├── pages/
+│   │   │   │   ├── site-list/          ← SiteListComponent (grille, recherche)
+│   │   │   │   ├── site-detail/        ← SiteDetailComponent (fiche site)
+│   │   │   │   └── site-create/        ← SiteCreateComponent (formulaire)
+│   │   │   └── routes.ts              ← SITE_ROUTES (list, new, :id)
+│   │   ├── page-builder/src/lib/       ⬜ Placeholder
+│   │   ├── api-connector/src/lib/      ⬜ Placeholder
+│   │   ├── mfe-registry/src/lib/       ⬜ Placeholder
+│   │   ├── iam/src/lib/                ⬜ Placeholder
+│   │   ├── versioning/src/lib/         ⬜ Placeholder
+│   │   └── admin/src/lib/              ⬜ Placeholder
 │   │
 │   └── shared/                          ← Briques transverses
-│       ├── models/src/lib/              ← Interfaces, types, enums
+│       ├── models/src/lib/              ✅ IMPLÉMENTÉ
 │       │   ├── common/                  ← BaseEntity, Pagination, Enums
 │       │   ├── tenant/                  ← Tenant
 │       │   ├── site/                    ← Site, CreateSitePayload
@@ -295,18 +307,9 @@ site-factory/
 │       │   ├── user/                    ← UserProfile, Role, Permission, AuditLog
 │       │   ├── versioning/              ← EntityVersion, WorkflowTransition
 │       │   └── admin/                   ← Theme, Translation, GlobalConfig
-│       ├── utils/src/lib/
-│       │   ├── helpers/                 ← slug(), deepClone()
-│       │   ├── validators/              ← JSON Schema validators
-│       │   └── mappers/                 ← DTO ↔ Model mappers
-│       ├── ui/src/lib/
-│       │   ├── components/              ← ConfirmDialog, DataTable
-│       │   ├── directives/              ← ClickOutside, AutoFocus
-│       │   └── pipes/                   ← DateFormat, Truncate
-│       └── design-system/src/lib/
-│           ├── components/              ← Wrappers Angular du DS vanilla
-│           ├── styles/                  ← SCSS du DS
-│           └── tokens/                  ← Design tokens exportés
+│       ├── utils/src/lib/               ⬜ Vide (structure prête)
+│       ├── ui/src/lib/                  ⬜ Vide (structure prête)
+│       └── design-system/src/lib/       ⬜ Vide (structure prête)
 │
 ├── eslint.config.mjs                    ← Module boundaries configurées
 ├── nx.json
@@ -316,31 +319,32 @@ site-factory/
 
 ### 5.2 Inventaire des libs (24 projets)
 
-| Couche | Lib | Tags Nx |
-|--------|-----|---------|
-| **core** | `core-auth` | `scope:core, type:util` |
-| | `core-http` | `scope:core, type:util` |
-| | `core-config` | `scope:core, type:util` |
-| | `core-i18n` | `scope:core, type:util` |
-| | `core-logger` | `scope:core, type:util` |
-| **shared** | `shared-models` | `scope:shared, type:models` |
-| | `shared-utils` | `scope:shared, type:util` |
-| | `shared-ui` | `scope:shared, type:ui` |
-| | `shared-design-system` | `scope:shared, type:ui` |
-| **domain** | `domain-site` | `scope:domain, domain:site, type:domain-logic` |
-| | `domain-page` | `scope:domain, domain:page, type:domain-logic` |
-| | `domain-api-connector` | `scope:domain, domain:api-connector, type:domain-logic` |
-| | `domain-mfe-registry` | `scope:domain, domain:mfe-registry, type:domain-logic` |
-| | `domain-iam` | `scope:domain, domain:iam, type:domain-logic` |
-| | `domain-versioning` | `scope:domain, domain:versioning, type:domain-logic` |
-| | `domain-admin` | `scope:domain, domain:admin, type:domain-logic` |
-| **features** | `feature-site` | `scope:feature, domain:site, type:feature` |
-| | `feature-page-builder` | `scope:feature, domain:page, type:feature` |
-| | `feature-api-connector` | `scope:feature, domain:api-connector, type:feature` |
-| | `feature-mfe-registry` | `scope:feature, domain:mfe-registry, type:feature` |
-| | `feature-iam` | `scope:feature, domain:iam, type:feature` |
-| | `feature-versioning` | `scope:feature, domain:versioning, type:feature` |
-| | `feature-admin` | `scope:feature, domain:admin, type:feature` |
+| Couche | Lib | Tags Nx | Statut |
+|--------|-----|---------|--------|
+| **app** | `cms-admin` | `scope:app, type:app` | ✅ Shell fonctionnel |
+| **core** | `core-auth` | `scope:core` | ✅ WSO2 IS OIDC |
+| | `core-http` | `scope:core` | ✅ ApiClient + interceptors |
+| | `core-logger` | `scope:core` | ✅ LoggerService configurable |
+| | `core-config` | `scope:core` | ⬜ À construire |
+| | `core-i18n` | `scope:core` | ⬜ À construire |
+| **shared** | `shared-models` | `scope:shared, type:models` | ✅ Tous les modèles |
+| | `shared-utils` | `scope:shared, type:util` | ⬜ Structure prête |
+| | `shared-ui` | `scope:shared, type:ui` | ⬜ Structure prête |
+| | `shared-design-system` | `scope:shared, type:ui` | ⬜ Structure prête |
+| **domain** | `domain-site` | `scope:domain, domain:site, type:domain-logic` | ✅ Pattern de référence |
+| | `domain-page` | `scope:domain, domain:page, type:domain-logic` | ⬜ À répliquer |
+| | `domain-api-connector` | `scope:domain, domain:api-connector, type:domain-logic` | ⬜ À répliquer |
+| | `domain-mfe-registry` | `scope:domain, domain:mfe-registry, type:domain-logic` | ⬜ À répliquer |
+| | `domain-iam` | `scope:domain, domain:iam, type:domain-logic` | ⬜ À répliquer |
+| | `domain-versioning` | `scope:domain, domain:versioning, type:domain-logic` | ⬜ À répliquer |
+| | `domain-admin` | `scope:domain, domain:admin, type:domain-logic` | ⬜ À répliquer |
+| **features** | `feature-site` | `scope:feature, domain:site, type:feature` | ✅ 3 pages fonctionnelles |
+| | `feature-page-builder` | `scope:feature, domain:page, type:feature` | ⬜ Placeholder |
+| | `feature-api-connector` | `scope:feature, domain:api-connector, type:feature` | ⬜ Placeholder |
+| | `feature-mfe-registry` | `scope:feature, domain:mfe-registry, type:feature` | ⬜ Placeholder |
+| | `feature-iam` | `scope:feature, domain:iam, type:feature` | ⬜ Placeholder |
+| | `feature-versioning` | `scope:feature, domain:versioning, type:feature` | ⬜ Placeholder |
+| | `feature-admin` | `scope:feature, domain:admin, type:feature` | ⬜ Placeholder |
 
 ---
 
@@ -353,12 +357,13 @@ site-factory/
 │                    RÈGLES D'IMPORT                         │
 ├───────────────────────────────────────────────────────────┤
 │                                                            │
-│  feature  ──►  domain ✅  shared ✅  core ✅               │
-│  domain   ──►  shared ✅  core ✅                          │
-│  core     ──►  shared ✅                                   │
-│  ui       ──►  models ✅  utils ✅                         │
-│  models   ──►  utils ✅                                    │
-│  utils    ──►  (rien — leaf absolu)                        │
+│  app     ──►  feature ✅  domain ✅  ui ✅  models ✅  utils ✅  │
+│  feature ──►  domain ✅  shared ✅  core ✅               │
+│  domain  ──►  shared ✅  core ✅                          │
+│  core    ──►  shared ✅                                   │
+│  ui      ──►  models ✅  utils ✅                         │
+│  models  ──►  utils ✅                                    │
+│  utils   ──►  (rien — leaf absolu)                        │
 │                                                            │
 │  INTERDIT :                                                │
 │  ✗ domain → feature                                        │
@@ -375,6 +380,7 @@ site-factory/
 
 | Source ↓ / Target → | feature | domain | core | ui | models | utils |
 |---|---|---|---|---|---|---|
+| **app** | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
 | **feature** | — | ✅ | ✅ | ✅ | ✅ | ✅ |
 | **domain** | ❌ | ❌ | ❌ | ❌ | ✅ | ✅ |
 | **core** | ❌ | ❌ | — | ❌ | ✅ | ✅ |
@@ -384,27 +390,347 @@ site-factory/
 
 ### 6.3 Isolation des domaines
 
-Chaque domaine est isolé des autres. Aucun import croisé entre `domain:site` et `domain:page` par exemple. La communication inter-domaine se fait **exclusivement** au niveau feature ou via le shell applicatif.
-
-| Source | Imports interdits |
-|---|---|
-| `domain:site` | page, api-connector, mfe-registry, iam, versioning, admin |
-| `domain:page` | site, api-connector, mfe-registry, iam, versioning, admin |
-| `domain:api-connector` | site, page, mfe-registry, iam, versioning, admin |
-| `domain:mfe-registry` | site, page, api-connector, iam, versioning, admin |
-| `domain:iam` | site, page, api-connector, mfe-registry, versioning, admin |
-| `domain:versioning` | site, page, api-connector, mfe-registry, iam, admin |
-| `domain:admin` | site, page, api-connector, mfe-registry, iam, versioning |
+Chaque domaine est isolé des autres. Aucun import croisé entre `domain:site` et `domain:page`. La communication inter-domaine se fait **exclusivement** au niveau feature ou via le shell applicatif.
 
 ### 6.4 Enforcement
 
-Les rules sont configurées dans `eslint.config.mjs` via le plugin `@nx/enforce-module-boundaries`. Toute violation est détectée au `lint` et bloque le CI.
+Configuré dans `eslint.config.mjs` via `@nx/enforce-module-boundaries`. Toute violation est détectée au `lint` et bloque le CI. **24/24 projets lint clean** ✅.
 
 ---
 
-## 7. Modèle de Données
+## 7. Core — Services d'infrastructure
 
-### 7.1 Principes de conception
+### 7.1 core/http
+
+**Rôle** : Client HTTP générique typé, gestion globale des erreurs et du loading.
+
+```
+core/http/
+├── models/
+│   ├── api-response.model.ts        ← ApiResponse<T>, ApiPaginatedResponse<T>
+│   ├── api-error.model.ts           ← ApiError, ApiHttpError (classe avec helpers)
+│   └── http-request-options.model.ts ← HttpRequestOptions (skipLoading, skipErrorHandling)
+├── services/
+│   ├── api-client.service.ts        ← GET, POST, PUT, PATCH, DELETE typés
+│   └── loading.service.ts           ← Signal-based loading tracker
+├── interceptors/
+│   ├── error.interceptor.ts         ← Parse les erreurs, crée ApiHttpError
+│   └── loading.interceptor.ts       ← Start/stop LoadingService automatiquement
+└── providers/
+    └── provide-http-core.ts         ← provideHttpCore() — configure tout
+```
+
+**API publique** :
+
+```typescript
+// Utilisation dans un service domain
+const api = inject(ApiClientService);
+
+// Requête standard (loading + error handling auto)
+api.get<Site[]>('/api/sites');
+
+// Skip le loading (requêtes background)
+api.get<Site[]>('/api/sites', { skipLoading: true });
+
+// Skip l'error handling (gestion manuelle)
+api.post<Site>('/api/sites', payload, { skipErrorHandling: true });
+```
+
+**Pattern interceptor** : Angular v21 functional interceptors avec `HttpContextToken` pour contrôle par requête.
+
+### 7.2 core/logger
+
+**Rôle** : Logging structuré, configurable par environnement.
+
+```
+core/logger/
+├── models/
+│   ├── log-level.model.ts           ← enum LogLevel (Debug, Info, Warn, Error, Off)
+│   ├── log-entry.model.ts           ← LogEntry (level, message, context, data, timestamp)
+│   └── logger-config.model.ts       ← LoggerConfig, LOGGER_CONFIG injection token
+├── services/
+│   └── logger.service.ts            ← LoggerService (signal-based buffer, console output)
+└── providers/
+    └── provide-logger.ts            ← provideLogger({ minLevel, enableConsole })
+```
+
+**API publique** :
+
+```typescript
+const logger = inject(LoggerService);
+
+logger.debug('Site chargé', 'SiteStore', { id: '123' });
+logger.info('Navigation vers Sites', 'Router');
+logger.warn('Token expire bientôt', 'AuthService');
+logger.error('Échec API', 'SiteApiService', error);
+
+// Buffer consultable (pour debug UI ou reporting)
+logger.recentLogs(); // Signal<LogEntry[]> — dernières 100 entrées
+```
+
+**Configuration** :
+
+```typescript
+// Dev — tout afficher
+provideLogger({ minLevel: LogLevel.Debug, enableConsole: true })
+
+// Prod — warn+ seulement, console off
+provideLogger({ minLevel: LogLevel.Warn, enableConsole: false })
+```
+
+### 7.3 core/auth
+
+**Rôle** : Authentification WSO2 IS via OIDC (Authorization Code + PKCE).
+
+```
+core/auth/
+├── models/
+│   ├── auth-state.model.ts          ← AuthState, INITIAL_AUTH_STATE
+│   ├── auth-user.model.ts           ← AuthUser (sub, email, displayName, roles, permissions)
+│   └── auth-config.model.ts         ← SfAuthConfig, SF_AUTH_CONFIG token
+├── services/
+│   └── auth.service.ts              ← AuthService (signal-based, wraps angular-auth-oidc-client)
+├── guards/
+│   ├── auth.guard.ts                ← authGuard (redirige vers login si non authentifié)
+│   └── role.guard.ts                ← roleGuard (vérifie permissions/rôles via route data)
+├── interceptors/
+│   └── token.interceptor.ts         ← Injecte Bearer token sur les API sécurisées
+└── providers/
+    └── provide-auth.ts              ← provideAuth(config) — configure OIDC + auto-init
+```
+
+**API publique** :
+
+```typescript
+const auth = inject(AuthService);
+
+// Signals
+auth.isAuthenticated();  // Signal<boolean>
+auth.currentUser();      // Signal<AuthUser | null>
+auth.accessToken();      // Signal<string | null>
+auth.userSub();          // Signal<string | null>
+auth.isLoading();        // Signal<boolean>
+
+// Actions
+auth.login();            // Redirect vers WSO2 IS
+auth.logout();           // Déconnexion
+auth.refreshToken();     // Force refresh
+
+// Vérification permissions
+auth.hasPermission('site:write');  // boolean
+auth.hasRole('platform_admin');    // boolean
+```
+
+**Guards** :
+
+```typescript
+// Protection simple (authentifié ?)
+{ path: 'sites', canActivate: [authGuard], ... }
+
+// Protection par rôle/permission
+{
+  path: 'admin',
+  canActivate: [roleGuard],
+  data: { permissions: ['config:write'], roles: ['platform_admin'] },
+  ...
+}
+```
+
+**Configuration** :
+
+```typescript
+...provideAuth({
+  issuerUrl: 'https://is.company.com/oauth2/token',
+  clientId: 'site-factory-cms',
+  redirectUri: window.location.origin,
+  postLogoutRedirectUri: window.location.origin,
+  scopes: 'openid profile email',
+  securedApiUrls: ['https://api.company.com'],
+})
+```
+
+**Dépendance externe** : `angular-auth-oidc-client` (lib OIDC certifiée).
+
+### 7.4 Intégration dans app.config.ts
+
+```typescript
+export const appConfig: ApplicationConfig = {
+  providers: [
+    provideZoneChangeDetection({ eventCoalescing: true }),
+    provideRouter(appRoutes, withComponentInputBinding()),
+
+    // HTTP — mock interceptor en dev, puis loading + error
+    provideHttpClient(
+      withInterceptors([
+        ...(isDevMode() ? [mockApiInterceptor] : []),
+        loadingInterceptor,
+        errorInterceptor,
+      ])
+    ),
+
+    // Logger
+    provideLogger({
+      minLevel: isDevMode() ? LogLevel.Debug : LogLevel.Warn,
+      enableConsole: isDevMode(),
+    }),
+
+    // Auth WSO2 IS
+    ...provideAuth({ ... }),
+  ],
+};
+```
+
+---
+
+## 8. Domain — Pattern SignalStore
+
+### 8.1 Pattern de référence : domain/site
+
+Chaque domaine suit le même pattern à 3 couches :
+
+```
+domain/{name}/
+├── models/
+│   ├── {name}-state.model.ts    ← State interface + INITIAL_STATE
+│   └── {name}-filters.model.ts  ← Filtres spécifiques au domaine
+├── services/
+│   └── {name}-api.service.ts    ← Appels HTTP via ApiClientService
+└── store/
+    └── {name}.store.ts          ← NgRx SignalStore
+```
+
+### 8.2 Structure du Store
+
+```typescript
+export const SiteStore = signalStore(
+  { providedIn: 'root' },
+
+  // State — état initial
+  withState<SiteState>(INITIAL_SITE_STATE),
+
+  // Computed — dérivés réactifs
+  withComputed(state => ({
+    totalPages: computed(() => Math.ceil(state.total() / state.pageSize())),
+    hasSites: computed(() => state.sites().length > 0),
+    hasError: computed(() => state.error() !== null),
+    siteCount: computed(() => state.sites().length),
+  })),
+
+  // Methods — actions (rxMethod pour l'asynchrone, fonctions pour le synchrone)
+  withMethods((store, siteApi = inject(SiteApiService)) => ({
+    loadSites: rxMethod<SiteFilters | void>(...),
+    loadSiteById: rxMethod<string>(...),
+    createSite: rxMethod<{ payload; onSuccess? }>(...),
+    updateSite: rxMethod<{ id; payload; onSuccess? }>(...),
+    deleteSite: rxMethod<{ id; onSuccess? }>(...),
+    selectSite(site: Site | null): void { ... },
+    clearError(): void { ... },
+    reset(): void { ... },
+  })),
+);
+```
+
+### 8.3 Conventions rxMethod
+
+Chaque `rxMethod` asynchrone suit le même pattern :
+
+```
+tap → patchState({ isLoading: true, error: null })
+switchMap → apiService.method().pipe(
+  tap → patchState({ data, isLoading: false })
+  catchError → patchState({ isLoading: false, error })
+)
+```
+
+Callbacks optionnels (`onSuccess`) pour la navigation post-action.
+
+### 8.4 Service API
+
+```typescript
+@Injectable({ providedIn: 'root' })
+export class SiteApiService {
+  private readonly api = inject(ApiClientService);
+  private readonly baseUrl = '/api/sites';
+
+  getAll(filters?: SiteFilters): Observable<ApiPaginatedResponse<Site>> { ... }
+  getById(id: string): Observable<ApiResponse<Site>> { ... }
+  create(payload: CreateSitePayload): Observable<ApiResponse<Site>> { ... }
+  update(id: string, payload: UpdateSitePayload): Observable<ApiResponse<Site>> { ... }
+  delete(id: string): Observable<ApiResponse<void>> { ... }
+}
+```
+
+Convention : le service API ne contient aucune logique métier, seulement la transformation requête/réponse.
+
+---
+
+## 9. Feature — Pattern écran fonctionnel
+
+### 9.1 Pattern de référence : feature-site
+
+```
+features/site/
+├── pages/
+│   ├── site-list/
+│   │   └── site-list.component.ts       ← Grille de sites, recherche, suppression
+│   ├── site-detail/
+│   │   └── site-detail.component.ts     ← Fiche détaillée d'un site
+│   └── site-create/
+│       └── site-create.component.ts     ← Formulaire de création
+├── routes.ts                            ← SITE_ROUTES
+└── index.ts                             ← export { SITE_ROUTES }
+```
+
+### 9.2 Routes
+
+```typescript
+export const SITE_ROUTES: Routes = [
+  { path: '',    loadComponent: () => import('./pages/site-list/...') },
+  { path: 'new', loadComponent: () => import('./pages/site-create/...') },
+  { path: ':id', loadComponent: () => import('./pages/site-detail/...') },
+];
+```
+
+Convention : `loadComponent` avec lazy import, jamais d'import statique des pages.
+
+### 9.3 Consommation du Store dans un composant
+
+```typescript
+@Component({ ... })
+export class SiteListComponent implements OnInit {
+  readonly store = inject(SiteStore);
+
+  ngOnInit() {
+    this.store.loadSites();
+  }
+}
+```
+
+```html
+@if (store.isLoading()) { <loader /> }
+@for (site of store.sites(); track site.id) { <card /> }
+@if (store.hasError()) { <error /> }
+```
+
+Convention : les composants feature sont des **smart components** — ils injectent le store, appellent ses méthodes, et lient leurs templates aux signals du store. Aucune logique métier dans le composant.
+
+### 9.4 Input depuis la route
+
+Angular v21 + `withComponentInputBinding()` permet d'injecter les paramètres de route comme inputs :
+
+```typescript
+readonly id = input.required<string>();  // ← injecté depuis :id dans la route
+
+ngOnInit() {
+  this.store.loadSiteById(this.id());
+}
+```
+
+---
+
+## 10. Modèle de Données
+
+### 10.1 Principes de conception
 
 | Principe | Détail |
 |----------|--------|
@@ -414,7 +740,7 @@ Les rules sont configurées dans `eslint.config.mjs` via le plugin `@nx/enforce-
 | **Versioning par snapshot** | Snapshot JSON complet de l'entité à chaque version |
 | **Soft delete systématique** | `deleted_at TIMESTAMP NULL` partout |
 
-### 7.2 Entités par domaine
+### 10.2 Entités par domaine
 
 #### D1 — Site Management
 
@@ -487,16 +813,6 @@ Contrainte unique : `(site_id, path)`
 | `created_at` | TIMESTAMP | NOT NULL | Date de création |
 | `updated_at` | TIMESTAMP | NOT NULL | Dernière modification |
 
-Exemple `zones` :
-```json
-[
-  { "key": "header", "label": "En-tête" },
-  { "key": "main", "label": "Zone principale" },
-  { "key": "sidebar", "label": "Barre latérale" },
-  { "key": "footer", "label": "Pied de page" }
-]
-```
-
 **BlockDefinition**
 
 | Colonne | Type | Contrainte | Description |
@@ -529,21 +845,6 @@ Exemple `zones` :
 | `visibility` | JSONB | NULL | Règles d'affichage (cible) |
 | `created_at` | TIMESTAMP | NOT NULL | Date de création |
 | `updated_at` | TIMESTAMP | NOT NULL | Dernière modification |
-
-Exemple `api_binding` :
-```json
-{
-  "apiRefId": "550e8400-e29b-41d4-a716-446655440000",
-  "operationId": "POST /declarations",
-  "requestMapping": {
-    "bloc_prop_type_sinistre": "$.body.typeSinistre",
-    "bloc_prop_date": "$.body.dateSurvenance"
-  },
-  "responseMapping": {
-    "$.data.numero": "bloc_prop_confirmation_id"
-  }
-}
-```
 
 #### D3 — API Connector (WSO2 APIM)
 
@@ -722,7 +1023,7 @@ Contrainte unique : `(locale, namespace, key)`
 
 ---
 
-## 8. Schéma Relationnel Global
+## 11. Schéma Relationnel Global
 
 ```
 Tenant ──1:N──► Site ──1:N──► Page ──1:N──► BlockInstance
@@ -753,7 +1054,7 @@ GlobalConfig ──► clé/valeur plateforme
 
 ---
 
-## 9. Index Recommandés
+## 12. Index Recommandés
 
 | Table | Index | Justification |
 |-------|-------|---------------|
@@ -771,7 +1072,7 @@ GlobalConfig ──► clé/valeur plateforme
 
 ---
 
-## 10. Conventions
+## 13. Conventions
 
 | Convention | Règle |
 |------------|-------|
@@ -785,12 +1086,19 @@ GlobalConfig ──► clé/valeur plateforme
 | **Nommage colonnes** | `snake_case` |
 | **Nommage libs Nx** | `{couche}-{domaine}` (ex: `domain-site`, `feature-admin`) |
 | **Tags Nx** | `scope:{couche}`, `type:{type}`, `domain:{domaine}` |
+| **Prefix composants** | `sf-` (Site Factory) |
 | **Barrel exports** | Chaque lib expose son API publique via `index.ts` |
 | **Composants** | Standalone, pas de `NgModule` |
+| **Interceptors** | Functional (`HttpInterceptorFn`), jamais class-based |
+| **State management** | NgRx SignalStore, `rxMethod` pour l'asynchrone |
+| **Providers** | `provideXxx()` function pattern |
+| **Types exports** | `export type` pour les interfaces (isolatedModules) |
+| **Templates** | Angular v21 `@if`, `@for`, `@defer` — pas de `*ngIf`/`*ngFor` |
+| **Route params** | `input.required<T>()` via `withComponentInputBinding()` |
 
 ---
 
-## 11. Risques et Mitigations
+## 14. Risques et Mitigations
 
 | Risque | Impact | Mitigation |
 |--------|--------|------------|
@@ -799,12 +1107,15 @@ GlobalConfig ──► clé/valeur plateforme
 | **Couplage WSO2** | Changement d'ID scheme = impact cascade | Champs WSO2 toujours derrière un adapter. |
 | **Dénormalisation `Page.path`** | Désynchronisation arborescence/path | Recalcul via trigger DB ou service dédié. |
 | **`AuditLog` volumétrie** | Croissance linéaire continue | Partitionnement par date, archivage à froid 12 mois. |
-| **Node v24 + Nx** | Compatibilité potentielle (Node 24 est très récent) | Surveiller les issues Nx, fallback sur Node 22 LTS si nécessaire. |
+| **Node v24 + Nx** | Compatibilité (Node 24 est très récent) | Surveiller les issues Nx, fallback sur Node 22 LTS si nécessaire. |
 | **DS vanilla JS/SCSS** | Intégration Angular non native | Wrappers Angular dans `shared/design-system`, migration progressive. |
+| **core/http ↔ core/logger** | Les deux sont scope:core, pas d'import croisé | `console.error` dans l'interceptor pour le moment. Résolution via LogHandler injectable (documenté). |
+| **Mock interceptor en prod** | Fausses données servies | Protégé par `isDevMode()` dans app.config.ts. Jamais bundlé en prod. |
+| **angular-auth-oidc-client** | Dépendance externe pour l'auth | Lib mature, certifiée OpenID. AuthService wrapper = possibilité de changer sans impact. |
 
 ---
 
-## 12. Roadmap Technique
+## 15. Roadmap Technique
 
 ### Phase 1 — Fondations (✅ en cours)
 
@@ -812,23 +1123,31 @@ GlobalConfig ──► clé/valeur plateforme
 - [x] Scaffold des 24 libs (4 couches)
 - [x] Nettoyage et restructuration interne
 - [x] Modèles TypeScript (shared/models)
-- [x] Module boundaries ESLint
-- [ ] Stores SignalStore (domain/)
-- [ ] Core/auth (WSO2 IS)
-- [ ] Routing + shell applicatif
-- [ ] Core/http (API client, interceptors)
+- [x] Module boundaries ESLint — **24/24 lint clean**
+- [x] Shell applicatif (layout sidebar + header + content)
+- [x] Routing avec lazy loading des 7 features
+- [x] core/http (ApiClientService, interceptors, LoadingService)
+- [x] core/logger (LoggerService, configurable par env)
+- [x] core/auth (WSO2 IS OIDC, guards, token interceptor)
+- [x] domain/site — SignalStore pattern de référence
+- [x] feature/site — Premier écran fonctionnel (list, detail, create)
+- [x] Mock interceptor pour le développement
+- [ ] core/config (environnements, base URL)
+- [ ] core/i18n (traductions)
+- [ ] Répliquer le pattern store pour les 6 autres domaines
+- [ ] Intégration Design System
 
 ### Phase 2 — Tier 1 MVP (D1, D4, D5)
 
-- [ ] Site Management (CRUD, config, routes)
-- [ ] MFE Registry (registre, chargement dynamique)
-- [ ] IAM (auth WSO2, RBAC, audit)
-- [ ] Intégration Design System
+- [ ] Site Management complet (CRUD, config, arborescence pages)
+- [ ] MFE Registry (registre, chargement dynamique Module Federation)
+- [ ] IAM (auth WSO2 live, RBAC, audit)
+- [ ] Backend API réel (remplacer mocks)
 
 ### Phase 3 — Tier 2 MVP (D2, D3)
 
 - [ ] Page Builder (layouts, blocs, preview)
-- [ ] API Connector WSO2 (catalogue, binding)
+- [ ] API Connector WSO2 APIM (catalogue, binding OAS)
 
 ### Phase 4 — Tier 3 MVP (D6, D7)
 
@@ -846,4 +1165,19 @@ GlobalConfig ──► clé/valeur plateforme
 
 ---
 
-*Document généré dans le cadre du projet Site Factory CMS — Architecture Angular v21 + Nx Monorepo*
+## Annexe — Dépendances
+
+| Package | Version | Rôle |
+|---------|---------|------|
+| `@angular/core` | v21 | Framework |
+| `@nx/angular` | latest | Monorepo tooling |
+| `@ngrx/signals` | latest | State management (SignalStore) |
+| `angular-auth-oidc-client` | latest | OIDC/OAuth2 |
+| `@angular-architects/module-federation` | latest | MFE |
+| `zone.js` | latest | Zone.js (Angular change detection) |
+| `rxjs` | latest | Reactive programming |
+
+---
+
+*Document généré dans le cadre du projet Site Factory CMS — Architecture Angular v21 + Nx Monorepo*  
+*Sessions de travail : 18-19 février 2026*
