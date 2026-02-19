@@ -1,0 +1,102 @@
+{
+    "common": {
+        "actions": {
+            "save": "Enregistrer",
+            "cancel": "Annuler",
+            "delete": "Supprimer",
+            "edit": "Modifier",
+            "create": "Créer",
+            "search": "Rechercher",
+            "confirm": "Confirmer",
+            "back": "Retour",
+            "close": "Fermer",
+            "loading": "Chargement..."
+        },
+        "status": {
+            "draft": "Brouillon",
+            "active": "Actif",
+            "published": "Publié",
+            "archived": "Archivé"
+        },
+        "errors": {
+            "generic": "Une erreur est survenue",
+            "notFound": "Ressource introuvable",
+            "forbidden": "Accès refusé",
+            "validation": "Données invalides"
+        },
+        "pagination": {
+            "showing": "Affichage de {{from}} à {{to}} sur {{total}}",
+            "noResults": "Aucun résultat"
+        }
+    },
+    "nav": {
+        "sites": "Sites",
+        "pages": "Pages",
+        "apiConnector": "Connecteur API",
+        "mfeRegistry": "Micro-Frontends",
+        "iam": "Utilisateurs",
+        "versioning": "Versions",
+        "admin": "Administration"
+    },
+    "site": {
+        "list": {
+            "title": "Gestion des sites",
+            "subtitle": "Catalogue des sites de la plateforme",
+            "empty": "Aucun site trouvé",
+            "searchPlaceholder": "Rechercher un site..."
+        },
+        "detail": {
+            "title": "Détail du site",
+            "domain": "Domaine",
+            "tenant": "Tenant",
+            "theme": "Thème",
+            "locale": "Langue par défaut",
+            "status": "Statut",
+            "createdAt": "Créé le",
+            "updatedAt": "Modifié le"
+        },
+        "create": {
+            "title": "Nouveau site",
+            "namePlaceholder": "Nom du site",
+            "slugPlaceholder": "identifiant-url",
+            "success": "Site créé avec succès"
+        }
+    },
+    "page": {
+        "list": {
+            "title": "Pages de {{siteName}}",
+            "empty": "Aucune page",
+            "addRoot": "Ajouter une page racine"
+        }
+    },
+    "iam": {
+        "users": {
+            "title": "Utilisateurs",
+            "searchPlaceholder": "Rechercher un utilisateur...",
+            "roles": "Rôles",
+            "lastLogin": "Dernière connexion"
+        },
+        "audit": {
+            "title": "Journal d'audit",
+            "action": "Action",
+            "entity": "Entité",
+            "date": "Date"
+        }
+    },
+    "admin": {
+        "themes": {
+            "title": "Thèmes",
+            "default": "Thème par défaut"
+        },
+        "translations": {
+            "title": "Traductions",
+            "locale": "Langue",
+            "namespace": "Espace de noms",
+            "key": "Clé",
+            "value": "Valeur"
+        },
+        "config": {
+            "title": "Configuration globale"
+        }
+    }
+}

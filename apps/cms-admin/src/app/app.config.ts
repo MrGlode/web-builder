@@ -8,6 +8,7 @@ import { errorInterceptor, loadingInterceptor } from '@site-factory/core-http';
 import { mockApiInterceptor } from './mocks/mock.interceptor';
 import { appRoutes } from './app.routes';
 import { environment } from '../environments/environment';
+import { provideI18n } from '@site-factory/core-i18n';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -38,6 +39,13 @@ export const appConfig: ApplicationConfig = {
       postLogoutRedirectUri: window.location.origin,
       scopes: environment.auth.scopes,
       securedApiUrls: [...environment.auth.securedApiUrls],
+    }),
+
+    provideI18n({
+      defaultLocale: 'fr',
+      availableLocales: ['fr', 'en'],
+      translationBasePath: '/assets/i18n',
+      debugMissing: !environment.production,
     }),
   ],
 };

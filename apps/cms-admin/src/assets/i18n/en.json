@@ -1,0 +1,102 @@
+{
+    "common": {
+        "actions": {
+            "save": "Save",
+            "cancel": "Cancel",
+            "delete": "Delete",
+            "edit": "Edit",
+            "create": "Create",
+            "search": "Search",
+            "confirm": "Confirm",
+            "back": "Back",
+            "close": "Close",
+            "loading": "Loading..."
+        },
+        "status": {
+            "draft": "Draft",
+            "active": "Active",
+            "published": "Published",
+            "archived": "Archived"
+        },
+        "errors": {
+            "generic": "An error occurred",
+            "notFound": "Resource not found",
+            "forbidden": "Access denied",
+            "validation": "Invalid data"
+        },
+        "pagination": {
+            "showing": "Showing {{from}} to {{to}} of {{total}}",
+            "noResults": "No results"
+        }
+    },
+    "nav": {
+        "sites": "Sites",
+        "pages": "Pages",
+        "apiConnector": "API Connector",
+        "mfeRegistry": "Micro-Frontends",
+        "iam": "Users",
+        "versioning": "Versions",
+        "admin": "Administration"
+    },
+    "site": {
+        "list": {
+            "title": "Site Management",
+            "subtitle": "Platform site catalog",
+            "empty": "No sites found",
+            "searchPlaceholder": "Search for a site..."
+        },
+        "detail": {
+            "title": "Site Details",
+            "domain": "Domain",
+            "tenant": "Tenant",
+            "theme": "Theme",
+            "locale": "Default language",
+            "status": "Status",
+            "createdAt": "Created on",
+            "updatedAt": "Updated on"
+        },
+        "create": {
+            "title": "New Site",
+            "namePlaceholder": "Site name",
+            "slugPlaceholder": "url-identifier",
+            "success": "Site created successfully"
+        }
+    },
+    "page": {
+        "list": {
+            "title": "Pages of {{siteName}}",
+            "empty": "No pages",
+            "addRoot": "Add a root page"
+        }
+    },
+    "iam": {
+        "users": {
+            "title": "Users",
+            "searchPlaceholder": "Search for a user...",
+            "roles": "Roles",
+            "lastLogin": "Last login"
+        },
+        "audit": {
+            "title": "Audit Log",
+            "action": "Action",
+            "entity": "Entity",
+            "date": "Date"
+        }
+    },
+    "admin": {
+        "themes": {
+            "title": "Themes",
+            "default": "Default theme"
+        },
+        "translations": {
+            "title": "Translations",
+            "locale": "Language",
+            "namespace": "Namespace",
+            "key": "Key",
+            "value": "Value"
+        },
+        "config": {
+            "title": "Global Configuration"
+        }
+    }
+}

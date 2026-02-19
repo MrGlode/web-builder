@@ -57,8 +57,6 @@ export default [
             // ============================================
             // CORE -> peut importer d'autres core + shared
             // JAMAIS domain, JAMAIS feature
-            // Un core PEUT dependre d'un autre core
-            // (ex: core-http importe core-config)
             // ============================================
             {
               sourceTag: 'type:core',
@@ -93,8 +91,6 @@ export default [
 
             // ============================================
             // DOMAIN ISOLATION
-            // Un domaine ne peut pas importer un autre domaine
-            // (chaque regle empeche les imports croises)
             // ============================================
             {
               sourceTag: 'domain:site',
