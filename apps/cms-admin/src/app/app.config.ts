@@ -1,12 +1,18 @@
-import { ApplicationConfig, provideZoneChangeDetection } from '@angular/core';
+import { ApplicationConfig, provideZoneChangeDetection, isDevMode } from '@angular/core';
 import { provideRouter, withComponentInputBinding } from '@angular/router';
-import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
+import { provideHttpCore } from '@site-factory/core-http';
+import { provideLogger } from '@site-factory/core-logger';
+import { LogLevel } from '@site-factory/core-logger';
 import { appRoutes } from './app.routes';
 
 export const appConfig: ApplicationConfig = {
   providers: [
     provideZoneChangeDetection({ eventCoalescing: true }),
     provideRouter(appRoutes, withComponentInputBinding()),
-    provideHttpClient(withInterceptorsFromDi()),
+    ...provideHttpCore(),
+    provideLogger({
+      minLevel: isDevMode() ? LogLevel.Debug : LogLevel.Warn,
+      enableConsole: isDevMode(),
+    }),
   ],
 };
