@@ -4,6 +4,11 @@ export const VERSIONING_ROUTES: Routes = [
   {
     path: '',
     loadComponent: () =>
-      import('./pages/versioning-shell.component').then(m => m.VersioningShellComponent),
+      import('./pages/version-list.component').then((m) => m.VersionListComponent),
+  },
+  {
+    path: ':id',
+    loadComponent: () =>
+      import('./pages/version-detail.component').then((m) => m.VersionDetailComponent),
   },
 ];
