@@ -7,6 +7,11 @@ import { LoadingService } from '../services/loading.service';
 export const SKIP_LOADING = new HttpContextToken<boolean>(() => false);
 
 export const loadingInterceptor: HttpInterceptorFn = (req, next) => {
+
+  if (!req.url.startsWith('/api/')) {
+    return next(req);
+  }
+
   if (req.context.get(SKIP_LOADING)) {
     return next(req);
   }

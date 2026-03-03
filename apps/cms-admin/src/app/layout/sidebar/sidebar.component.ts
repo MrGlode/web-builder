@@ -90,12 +90,12 @@ interface NavItem {
 })
 export class SidebarComponent {
   readonly navItems: NavItem[] = [
-    { label: 'Dashboard', path: '/dashboard', icon: '📊' },
-    { label: 'Sites', path: '/sites', icon: '🌐' },
-    { label: 'Page Builder', path: '/page-builder', icon: '📄' },
-    { label: 'API Connector', path: '/api-connector', icon: '🔌' },
-    { label: 'MFE Registry', path: '/mfe-registry', icon: '🧩' },
-    { label: 'Utilisateurs', path: '/iam', icon: '👤' },
-    { label: 'Versioning', path: '/versioning', icon: '📋' },
+    { label: 'Sites',           path: '/sites',         icon: '🌐' },
+    { label: 'Pages',           path: '/pages',         icon: '📄' },
+    { label: 'API Connecteurs', path: '/api-connectors', icon: '🔌' },
+    { label: 'MFE Registry',    path: '/mfe-registry',  icon: '🧩' },
+    { label: 'Utilisateurs',    path: '/iam',           icon: '👤' },
+    { label: 'Versioning',      path: '/versioning',    icon: '📋' },
+    { label: 'Administration',  path: '/admin',         icon: '⚙️' },
   ];
 }

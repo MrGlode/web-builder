@@ -8,7 +8,7 @@ export const environment: AppConfig = {
   auth: {
     issuerUrl: 'https://is.placeholder.company.com/oauth2/token',
     clientId: 'site-factory-cms',
-    scopes: 'openid profile email',
+    scopes: 'openid profile email offline_access',
     securedApiUrls: ['https://api.placeholder.company.com'],
   },
 

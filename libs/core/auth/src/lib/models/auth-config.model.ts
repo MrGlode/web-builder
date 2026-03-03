@@ -13,6 +13,8 @@ export interface SfAuthConfig {
   scopes: string;
   /** URL de l'API protégée (pour le token interceptor) */
   securedApiUrls: string[];
+  /** Désactiver le silent renew pour le mode mock */
+  silentRenew?: boolean;
 }
 
 export const SF_AUTH_CONFIG = new InjectionToken<SfAuthConfig>('SF_AUTH_CONFIG');
@@ -24,4 +26,5 @@ export const DEFAULT_AUTH_CONFIG: SfAuthConfig = {
   postLogoutRedirectUri: 'http://localhost:4200',
   scopes: 'openid profile email',
   securedApiUrls: ['https://api.placeholder.company.com'],
+  silentRenew: true
 };

@@ -3,33 +3,44 @@ import { OidcSecurityService } from 'angular-auth-oidc-client';
 import { take } from 'rxjs';
 import { AuthState, INITIAL_AUTH_STATE } from '../models/auth-state.model';
 import { AuthUser } from '../models/auth-user.model';
+import { APP_CONFIG } from '@site-factory/core-config';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
   private readonly oidc = inject(OidcSecurityService);
+  private readonly config = inject(APP_CONFIG);
 
   private readonly state = signal<AuthState>(INITIAL_AUTH_STATE);
 
-  /** L'utilisateur est-il authentifié ? */
   readonly isAuthenticated = computed(() => this.state().isAuthenticated);
-
-  /** Utilisateur courant */
   readonly currentUser = computed(() => this.state().user);
-
-  /** Token d'accès courant */
   readonly accessToken = computed(() => this.state().accessToken);
-
-  /** Chargement en cours (check initial) */
   readonly isLoading = computed(() => this.state().isLoading);
-
-  /** Wso2 subject ID (raccourci) */
   readonly userSub = computed(() => this.state().user?.sub ?? null);
 
   /**
    * Initialise l'auth — à appeler au démarrage de l'app.
-   * Vérifie si l'utilisateur a déjà une session active.
+   * En mode mock, simule un utilisateur authentifié sans contacter WSO2.
    */
   init(): void {
+    // ─── Mode mock : pas de WSO2, on simule un user ───
+    if (this.config.features.enableMocks) {
+      this.state.set({
+        isAuthenticated: true,
+        user: {
+          sub: 'mock-user-001',
+          email: 'dev@site-factory.local',
+          displayName: 'Dev User',
+          roles: ['admin'],
+          permissions: ['*'],
+        },
+        accessToken: 'mock-access-token',
+        isLoading: false,
+      });
+      return;
+    }
+
+    // ─── Mode réel : check auth WSO2 IS ───
     this.oidc.checkAuth().pipe(take(1)).subscribe({
       next: ({ isAuthenticated, userData, accessToken }) => {
         this.state.set({

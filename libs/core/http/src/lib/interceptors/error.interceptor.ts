@@ -1,5 +1,4 @@
 import { HttpContextToken, HttpInterceptorFn } from '@angular/common/http';
-import { inject } from '@angular/core';
 import { catchError, throwError } from 'rxjs';
 import { ApiHttpError } from '../models/api-error.model';
 
@@ -7,7 +6,7 @@ import { ApiHttpError } from '../models/api-error.model';
 export const SKIP_ERROR_HANDLING = new HttpContextToken<boolean>(() => false);
 
 export const errorInterceptor: HttpInterceptorFn = (req, next) => {
-  if (req.context.get(SKIP_ERROR_HANDLING)) {
+  if (!req.url.startsWith('/api/') || req.context.get(SKIP_ERROR_HANDLING)) {
     return next(req);
   }
 

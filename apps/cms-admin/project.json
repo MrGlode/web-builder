@@ -23,6 +23,11 @@
           {
             "glob": "**/*",
             "input": "apps/cms-admin/public"
+          },
+          {
+            "glob": "**/*",
+            "input": "apps/cms-admin/src/assets",
+            "output": "/assets"
           }
         ],
         "styles": [

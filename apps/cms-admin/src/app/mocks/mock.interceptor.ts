@@ -6,6 +6,7 @@ import type { Site } from '@site-factory/shared-models';
 const SIMULATED_DELAY = 600;
 
 export const mockApiInterceptor: HttpInterceptorFn = (req, next) => {
+
   // Ne mocker que les appels vers /api/
   if (!req.url.startsWith('/api/')) {
     return next(req);
