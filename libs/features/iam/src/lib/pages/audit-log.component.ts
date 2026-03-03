@@ -28,9 +28,9 @@ import { AuditStore } from '@site-factory/domain-iam';
 
     <sf-data-table
       [columns]="columns"
-      [data]="store.auditLogs()"
-      [loading]="store.loading()"
-      [totalItems]="store.auditLogs().length"
+      [data]="store.logs()"
+      [loading]="store.isLoading()"
+      [totalItems]="store.logCount()"
       [page]="currentPage()"
       (pageChange)="currentPage.set($event)"
       emptyMessage="Aucune entrée d'audit"
@@ -50,10 +50,10 @@ export class AuditLogComponent {
   ];
 
   constructor() {
-    this.store.loadAll();
+    this.store.loadLogs();
   }
 
   onSearch(search: string): void {
-    this.store.loadAll({ search });
+    this.store.loadLogs({ action: search });
   }
 }

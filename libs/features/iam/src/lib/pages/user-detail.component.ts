@@ -70,7 +70,7 @@ export class UserDetailComponent implements OnInit {
   ];
 
   ngOnInit(): void {
-    this.store.loadOne(this.id());
+    this.store.loadUserById(this.id());
     this.store.loadUserSiteRoles(this.id());
   }
 }

@@ -54,6 +54,10 @@ export class PageDetailComponent implements OnInit {
   readonly pageStore = inject(PageStore);
 
   ngOnInit(): void {
-    this.pageStore.loadOne(this.id());
+    // loadPageById attend { siteId, pageId } — on récupère le siteId depuis le store
+    this.pageStore.loadPageById({
+      siteId: this.pageStore.selectedSiteId(),
+      pageId: this.id(),
+    });
   }
 }

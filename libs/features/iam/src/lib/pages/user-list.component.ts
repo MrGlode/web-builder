@@ -35,8 +35,8 @@ import { IamStore } from '@site-factory/domain-iam';
     <sf-data-table
       [columns]="columns"
       [data]="store.users()"
-      [loading]="store.loading()"
-      [totalItems]="store.users().length"
+      [loading]="store.isLoading()"
+      [totalItems]="store.userCount()"
       [page]="currentPage()"
       (pageChange)="currentPage.set($event)"
       (rowClick)="onRowClick($event)"

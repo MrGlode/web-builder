@@ -32,9 +32,9 @@ import { ApiConnectorStore } from '@site-factory/domain-api-connector';
 
     <sf-data-table
       [columns]="columns"
-      [data]="store.connectors()"
-      [loading]="store.loading()"
-      [totalItems]="store.connectors().length"
+      [data]="store.apiReferences()"
+      [loading]="store.isLoading()"
+      [totalItems]="store.apiRefCount()"
       [page]="currentPage()"
       (pageChange)="currentPage.set($event)"
       (rowClick)="onRowClick($event)"
@@ -61,11 +61,11 @@ export class ApiConnectorListComponent {
   ];
 
   constructor() {
-    this.store.loadAll();
+    this.store.loadApiReferences();
   }
 
   onSearch(search: string): void {
-    this.store.loadAll({ search });
+    this.store.loadApiReferences({ search });
   }
 
   onSync(): void {

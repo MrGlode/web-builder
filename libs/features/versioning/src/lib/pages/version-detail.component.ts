@@ -86,7 +86,7 @@ export class VersionDetailComponent implements OnInit {
   ];
 
   ngOnInit(): void {
-    this.store.loadOne(this.id());
+    this.store.loadVersionById(this.id());
     this.store.loadTransitions(this.id());
   }
 }

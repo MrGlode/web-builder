@@ -35,8 +35,8 @@ import { MfeRegistryStore } from '@site-factory/domain-mfe-registry';
     <sf-data-table
       [columns]="columns"
       [data]="store.mfes()"
-      [loading]="store.loading()"
-      [totalItems]="store.mfes().length"
+      [loading]="store.isLoading()"
+      [totalItems]="store.mfeCount()"
       [page]="currentPage()"
       (pageChange)="currentPage.set($event)"
       (rowClick)="onRowClick($event)"
@@ -64,11 +64,11 @@ export class MfeListComponent {
   ];
 
   constructor() {
-    this.store.loadAll();
+    this.store.loadMfes();
   }
 
   onSearch(search: string): void {
-    this.store.loadAll({ search });
+    this.store.loadMfes({ search });
   }
 
   onRowClick(row: Record<string, unknown>): void {

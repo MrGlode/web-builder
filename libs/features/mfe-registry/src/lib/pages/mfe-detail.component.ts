@@ -61,7 +61,7 @@ import { MfeRegistryStore } from '@site-factory/domain-mfe-registry';
       <sf-data-table
         [columns]="deploymentColumns"
         [data]="store.deployments()"
-        [loading]="store.deploymentsLoading()"
+        [loading]="store.isLoading()"
         [totalItems]="store.deployments().length"
         emptyMessage="Aucun déploiement"
       >
@@ -95,7 +95,7 @@ export class MfeDetailComponent implements OnInit {
   ];
 
   ngOnInit(): void {
-    this.store.loadOne(this.id());
+    this.store.loadMfeById(this.id());
     this.store.loadDeployments(this.id());
   }
 }

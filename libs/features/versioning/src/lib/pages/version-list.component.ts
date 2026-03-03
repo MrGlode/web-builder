@@ -31,8 +31,8 @@ import { VersioningStore } from '@site-factory/domain-versioning';
     <sf-data-table
       [columns]="columns"
       [data]="store.versions()"
-      [loading]="store.loading()"
-      [totalItems]="store.versions().length"
+      [loading]="store.isLoading()"
+      [totalItems]="store.versionCount()"
       [page]="currentPage()"
       (pageChange)="currentPage.set($event)"
       (rowClick)="onRowClick($event)"
@@ -56,11 +56,12 @@ export class VersionListComponent {
   ];
 
   constructor() {
-    this.store.loadAll({ entityType: '', entityId: '' });
+    // TODO: récupérer entityType/entityId depuis la route ou un contexte de sélection
+    this.store.loadVersions({ entityType: '', entityId: '' });
   }
 
   onSearch(search: string): void {
-    // TODO: filter by entityType
+    // TODO: filtrer par entityType via un sélecteur dédié
   }
 
   onRowClick(row: Record<string, unknown>): void {

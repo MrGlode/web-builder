@@ -12,16 +12,16 @@ import { ApiConnectorStore } from '@site-factory/domain-api-connector';
   imports: [RouterLink, SfPageHeaderComponent, SfStatusBadgeComponent],
   template: `
     <sf-page-header
-      [title]="store.selectedConnector()?.name ?? 'Chargement...'"
+      [title]="store.selectedApiRef()?.name ?? 'Chargement...'"
       [breadcrumbs]="[
         { label: 'Connecteurs API', route: '/api-connectors' },
-        { label: store.selectedConnector()?.name ?? '...' }
+        { label: store.selectedApiRef()?.name ?? '...' }
       ]"
     >
       <a actions routerLink="/api-connectors" class="btn btn-secondary">← Retour</a>
     </sf-page-header>
 
-    @if (store.selectedConnector(); as api) {
+    @if (store.selectedApiRef(); as api) {
       <div class="detail-card">
         <div class="detail-row">
           <span class="detail-label">Version</span>
@@ -57,6 +57,6 @@ export class ApiConnectorDetailComponent implements OnInit {
   readonly store = inject(ApiConnectorStore);
 
   ngOnInit(): void {
-    this.store.loadOne(this.id());
+    this.store.loadApiRefById(this.id());
   }
 }
