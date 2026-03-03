@@ -1,11 +1,11 @@
 import { Component } from '@angular/core';
-import { RouterLink, RouterOutlet } from '@angular/router';
+import { RouterLink } from '@angular/router';
 import { SfPageHeaderComponent } from '@site-factory/shared-ui';
 
 @Component({
   selector: 'sf-admin-dashboard',
   standalone: true,
-  imports: [RouterLink, RouterOutlet, SfPageHeaderComponent],
+  imports: [RouterLink, SfPageHeaderComponent],
   template: `
     <sf-page-header
       title="Administration"

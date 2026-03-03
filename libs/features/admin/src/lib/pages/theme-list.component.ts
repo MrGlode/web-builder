@@ -38,7 +38,7 @@ import { AdminStore } from '@site-factory/domain-admin';
     <sf-data-table
       [columns]="columns"
       [data]="store.themes()"
-      [loading]="store.themesLoading()"
+      [loading]="store.isLoading()"
       [totalItems]="store.themes().length"
       [page]="currentPage()"
       (pageChange)="currentPage.set($event)"

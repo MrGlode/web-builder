@@ -29,7 +29,7 @@ import { AdminStore } from '@site-factory/domain-admin';
     <sf-data-table
       [columns]="columns"
       [data]="store.translations()"
-      [loading]="store.translationsLoading()"
+      [loading]="store.isLoading()"
       [totalItems]="store.translations().length"
       [page]="currentPage()"
       (pageChange)="currentPage.set($event)"

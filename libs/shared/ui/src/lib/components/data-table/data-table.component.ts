@@ -269,7 +269,7 @@ import { SfCellDirective } from './cell.directive';
 export class SfDataTableComponent {
   // --- Inputs ---
   readonly columns = input.required<TableColumn[]>();
-  readonly data = input.required<Record<string, unknown>[]>();
+  readonly data = input.required<any[]>();
   readonly loading = input(false);
   readonly totalItems = input(0);
   readonly page = input(1);

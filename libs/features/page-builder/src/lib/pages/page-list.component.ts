@@ -66,7 +66,7 @@ export class PageListComponent {
   }
 
   onSearch(search: string): void {
-    this.pageStore.loadPages({ siteId: this.pageStore.selectedSiteId(), search });
+    this.pageStore.loadPages({ siteId: this.pageStore.selectedSiteId() ?? '', search });
   }
 
   onSort(event: SortEvent): void {

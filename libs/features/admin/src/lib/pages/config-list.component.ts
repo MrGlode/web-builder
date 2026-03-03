@@ -26,7 +26,7 @@ import { AdminStore } from '@site-factory/domain-admin';
     <sf-data-table
       [columns]="columns"
       [data]="store.globalConfigs()"
-      [loading]="store.configLoading()"
+      [loading]="store.isLoading()"
       [totalItems]="store.globalConfigs().length"
       emptyMessage="Aucune configuration"
     />

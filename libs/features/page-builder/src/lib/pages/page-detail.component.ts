@@ -56,7 +56,7 @@ export class PageDetailComponent implements OnInit {
   ngOnInit(): void {
     // loadPageById attend { siteId, pageId } — on récupère le siteId depuis le store
     this.pageStore.loadPageById({
-      siteId: this.pageStore.selectedSiteId(),
+      siteId: this.pageStore.selectedSiteId() ?? '',
       pageId: this.id(),
     });
   }
